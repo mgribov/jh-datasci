@@ -1,0 +1,151 @@
+---
+title: "Coursera - Regression Models Class Project"
+author: "Max Gribov"
+date: "March 3, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Executive Summary
+
+This report analyzes miles per gallon (MPG) performance of various cars based on mtcars data set, and addresses the specific question of whether automatic or manual transmission is better for MPG. 
+
+According to the findings, when only transmission type is considered, cars with manual transmission get approximately 7 additional miles per gallon. However, considering only transmission type results in a low Adjsuted R-squared value of 0.3385 for the model, which implies there are other significant predictors for MPG.
+
+Additionally, if only car weight is considered, it plays a significant role as well, with approximately 5 MPG decrease per additional 1 ton of weight. Adjusted R-squared value of 0.7446 is much higher for this model, further indicating its significance, and making it a better predictor than transmission type.
+
+Finally, the best model found uses Transmission Type, Weight, and 1/4 Mile Time ("am", "wt", "qsec" columns), resulting in a model with all coefficients having statistical significance (p-value < 0.05) and Adjusted R-squared of 0.8336, explaining 83% of the variance in MPG. 
+
+This final model suggests that MPG will increase by about 3 if the car is using manual transmission, and the weight and 1/4 mile time stay constant, but the p-value for this coeffcient (0.046716) is just barely under significance treshold. Weight seems to play biggest role, with 4 MPG decrease for every additional 1 ton of weight, with p-value of 6.95e-06.
+
+## Data
+
+The data is the mtcars data set, which has MPG and other data for 32 different cars. The model examines effect of the transmission ("am" column) and weight ("wt" column) on MPG performance ("mpg" column).
+
+```{r cars}
+# load the dataset
+data(mtcars)
+
+# 32 observations of 11 variables
+dim(mtcars)
+
+# sample of the data
+head(mtcars)
+```
+
+
+## Data Exploration
+
+Our primary goal is to analyze the impact of transmission type on MPG. Since there are 2 possible values for the "am" column, we can create a simple boxplot showing that mean MPG is different for these 2 different populations. 
+
+```{r mpg, echo=FALSE}
+boxplot(mpg ~ am, data=mtcars, xlab="Transmission (0 - automatic, 1 - manual)", ylab="MPG", main="MPG vs transmission type")
+
+# means
+m_auto <- mean(mtcars[mtcars$am == 0, 'mpg'])
+m_man <- mean(mtcars[mtcars$am == 1, 'mpg'])
+paste('mean mpg for automatic:', m_auto, 'mean mpg for manual:', m_man)
+```
+
+
+We can also use T-Test to compare the 2 populations.
+
+```{r mpg_ttest}
+t.test(mtcars[mtcars$am == 0, 'mpg'], mtcars[mtcars$am == 1, 'mpg'])
+```
+Very low p-value of 0.001374 (below 0.05) indicates a significant differnce in the means, and that the data comes from 2 different populations.
+
+
+We can also examine the pair graph for any other clearly visible linear relationships, and we can see one for MPG and car weight.
+There also appears to be linear relationships between MPG and Engine Displacement, as well as MPG and Horse Power, but these should be expected, as they are well known to directly affect the fuel consumption rate.
+
+```{r pairs, echo=FALSE}
+pairs(mtcars)
+```
+
+## Model selection
+
+
+### MPG and transmission type
+
+We can use a simple linear model to examine the relationship between MPG and transmission.
+
+```{r lm_am}
+# train the model
+lm_am <- lm(mpg ~ am, data=mtcars)
+
+# model summary
+summary(lm_am)
+```
+
+This model shows that both intercept and "am" coefficient have very low p-values (below standard 0.05 treshold), which means we can reject the null hypotheses of both populations having same mean value. This proves that transmission type has a significant effect on resulting MPG performance. However, according to the Adjusted R-Squared value of 0.3385 this model can explain only 34% of the variance in MPG, which indicates there may be other significant predictors.
+
+Coefficient value of 7.245 for "am" is the average increase in MPG value for 1 unit of increase in "am" variable. "am" variable has only two possible values, 0 and 1, and if we substitute 0 we will get the intercept term only, which is in turn the mean of the population with automatic transmission (17.147)
+
+```{r lm_am_coeff}
+summary(lm_am)$coeff
+```
+
+Analysis of residuals shows that they are very close to being normally distributed according to their normal Q-Q plot, which indicates that this model is valid.
+
+```{r lm_am_resid}
+par(mfrow=c(2, 2))
+plot(lm_am)
+```
+
+
+### MPG and car weight
+
+Additionally, it appears that the car weight ("wt" column) have significant impact on MPG value. We can see some linearity in the following plot.
+
+```{r mpg_wt, echo=FALSE}
+plot(mpg ~ wt, data=mtcars, xlab="Car Weight (tons)", ylab="MPG", main="MPG vs car weight")
+abline(lm(mpg ~ wt, data=mtcars), lwd=2)
+```
+
+
+```{r lm_wt}
+# train the model
+lm_wt <- lm(mpg ~ wt, data=mtcars)
+
+# model summary
+summary(lm_wt)
+```
+
+According to a linear model predicting MPG based on weight, there is an average decrease of 5.34 MPG for every 1 ton increase in weight. The p-value of 1.29e-10 for the "wt" coefficient is very low, indicating its significance. This model also has a much higher Adjusted R-squared value of 0.7446, explaining 74% of the variation on MPG.
+
+However, according to the normal Q-Q plot of the residuals, this model is not as good as the one based on transmission type, since the residuals deviate from the line.
+
+```{r lm_wt_resid}
+par(mfrow=c(2, 2))
+plot(lm_wt)
+```
+
+
+### MPG and car weight, transmission type, and 1/4 mile time
+
+We will use step() to find the best model as compared to a full model.
+
+First, we build model on the full data. However, this model does not have any significant coefficients.
+```{r lm_full}
+lm_full <- lm(mpg ~ ., data=mtcars)
+summary(lm_full)
+```
+
+Next, we use step() to find best possible model.
+```{r lm_step}
+lm_step <- step(lm_full, trace=0)
+summary(lm_step)
+```
+
+All coefficients in this model ("wt", "qsec", "am") are significant, with p-value < 0.05, the model residual standard error is low at 2.459 and adjusted r-squared value is high at 0.8336, explaining 83% variance in MPG. The residuals are close to normally distributed according to the normal Q-Q plot. This appears to be the best model.
+
+```{r lm_step_resid}
+par(mfrow=c(2, 2))
+plot(lm_step)
+```
