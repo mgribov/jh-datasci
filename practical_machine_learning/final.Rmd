@@ -1,0 +1,19 @@
+---
+title: "Coursera - Practical Machine Learning Class Project"
+author: "Max Gribov"
+date: "April 15, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Executive Summary
+This report uses data from accelerometers placed on a dumbell to assess if the participant is performing a dumbell lift correctly. The data comes from http://groupware.les.inf.puc-rio.br/har and contains observed accelerometer values. Participants were asked to perform the exercise either correctly, or incorrectly in one of 4 specific ways. This is the "classe" predictor in the data set. The report builds 3 different models on this data to predict "classe" to let the participant know if they are performing the exercise correctly.
+
+The models considered were Random Forest (rf), trees with Stochastic Gradient Boosting (gbm), and Linear Discriminant Analysis (lda), ?<and an ensemble model combining all 3 previous models>. All models were trained using 10-fold Cross-Validation. Model performance was evaluated by using Accuracy, Kappa, and ROC curve.
+
+Random Forest model had the best Accuracy score, but took many hours to train, and reuslting object was over 1Gb in size. Linear Discriminant Analysis model had the lowest Accuracy score.
