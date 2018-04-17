@@ -2,12 +2,12 @@ library(caret)
 
 set.seed(12345)
 
-dat_test = read.csv("~/jh-datasci-projects/practical_machine_learning/pml-testing.csv", na.strings=c("","NA"))
+dat_test = read.csv("~/code/jh-datasci-projects/practical_machine_learning/pml-testing.csv", na.strings=c("","NA"))
 clean_test <- dat_test[,8:160]
 clean_test <- clean_test[, colnames(clean_test)[colSums(is.na(clean_test)) == 0]]
 
 # read the csv, make sure to mark empty cols as NA
-dat = read.csv("~/jh-datasci-projects/practical_machine_learning/pml-training.csv", na.strings=c("","NA"))
+dat = read.csv("~/code/jh-datasci-projects/practical_machine_learning/pml-training.csv", na.strings=c("","NA"))
 
 # clean up data to have only meaningful columns, first 8 are admin stuff
 clean <- dat[,8:160]
@@ -17,7 +17,7 @@ clean <- clean[, colnames(clean)[colSums(is.na(clean)) == 0]]
 
 # bias in predictor, classe A is most common, double any other classe
 # mean for other class counts: 3510 => (3797 + 3422 + 3216 + 3607)/4
-summary(clean)
+#summary(clean)
 
 # reduce instance of the class to mean of counts for other classes
 classeA <- clean[which(clean$classe == 'A'), ]
@@ -48,9 +48,10 @@ library(parallel)
 library(doParallel)
 cluster <- makeCluster(detectCores() - 1, outfile="") # convention to leave 1 core for OS
 registerDoParallel(cluster)
-# @todo parallel exec fails on my machine at final steps
-# gbm train: Error in unserialize(socklist[[n]]) : error reading from connection
-# ld train: Error in serialize(data, node$con) : error writing to connection
+
+# linux
+library(doMC)
+registerDoMC(cores = 3)
 
 # @todo: preProcess = "pca"?
 
@@ -83,6 +84,7 @@ ld <- train(
   classe ~ ., 
   data=training, 
   method="lda", 
+  metric="Kappa",
   trControl=fitControl, 
   na.action = na.omit
 )
@@ -115,9 +117,9 @@ confusionMatrix(ld_pred, testing$classe)$overall[["Kappa"]]
 
 ######################################
 # roc curve
-library(ROCR)
-roc_gb_pred <- prediction(predictions=gb_pred, labels=testing$classe)
-roc_perf_gb <- performance(roc_gb_pred, measure="tpr", x.measure="fpr")
+#library(ROCR)
+#roc_gb_pred <- prediction(predictions=gb_pred, labels=testing$classe)
+#roc_perf_gb <- performance(roc_gb_pred, measure="tpr", x.measure="fpr")
 
 ################################
 # test: combine gbm and lda models
@@ -137,23 +139,35 @@ confusionMatrix(comboPred, testing$classe)$overall[["Kappa"]]
 
 
 ################################
-# test some more models and compare to gbm and rf
-# decision trees: C5.0, rpart
-# knn
-# regularized logistic regression: regLogistic
+# test some more models and compare to: 
+#   gbm - accuracy:0.9671683, kappa:0.9589332 -- took hours to train, ~4 hours
+#   rf -- train failed every time, at some point it was running for ~8 hours
+# decision trees, both trains took a long time, ~2 hours: 
+#   C5.0 - accuracy:0.7200182, kappa:0.6498743
+#   rpart - accuracy:0.3896489, kappa:0.2234486
+# knn - accuracy:0.9220246, kappa:0.9025003 -- fast to train
+# lda - accuracy:0.6972184, kappa:0.6216202 -- fast to train
+# regularized logistic regression: regLogistic: accuracy:0.7200182, kappa:0.6498743 -- took very long time, ~6 hours
 # suport vector machines: lssvmLinear (least squares svm)
 # neuralnet: mxnet
-# naive bayes: nb
+# naive bayes: nb - accuracy:0.753306, kappa:0.6918142 -- fast to train
 test_model <- train(
   classe ~ ., 
   data=training, 
-  method="regLogistic", 
+  method="gam", 
+  metric="Kappa",
   trControl=fitControl, 
   na.action = na.omit
 )
 test_model_pred <- predict(test_model, testing)
 confusionMatrix(test_model_pred, testing$classe)$overall[["Accuracy"]]
 confusionMatrix(test_model_pred, testing$classe)$overall[["Kappa"]]
-saveRDS(test_model, "~/accel_model_regLogistic.rds")
+saveRDS(test_model, "~/accel_model_gam.rds")
 #################################
+
+test_model <- readRDS('/home/max/code/jh-datasci-projects/practical_machine_learning/accel_model_lda.rds')
+test_model_pred <- predict(test_model, testing)
+confusionMatrix(test_model_pred, testing$classe)$overall[["Accuracy"]]
+confusionMatrix(test_model_pred, testing$classe)$overall[["Kappa"]]
+
 
