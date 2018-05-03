@@ -154,7 +154,7 @@ confusionMatrix(comboPred, testing$classe)$overall[["Kappa"]]
 test_model <- train(
   classe ~ ., 
   data=training, 
-  method="gam", 
+  method="C5.0", 
   metric="Kappa",
   trControl=fitControl, 
   na.action = na.omit
@@ -162,12 +162,32 @@ test_model <- train(
 test_model_pred <- predict(test_model, testing)
 confusionMatrix(test_model_pred, testing$classe)$overall[["Accuracy"]]
 confusionMatrix(test_model_pred, testing$classe)$overall[["Kappa"]]
-saveRDS(test_model, "~/accel_model_gam.rds")
+saveRDS(test_model, "~/accel_model_C50.rds")
 #################################
 
 test_model <- readRDS('/home/max/code/jh-datasci-projects/practical_machine_learning/accel_model_lda.rds')
 test_model_pred <- predict(test_model, testing)
 confusionMatrix(test_model_pred, testing$classe)$overall[["Accuracy"]]
 confusionMatrix(test_model_pred, testing$classe)$overall[["Kappa"]]
+
+# best model comparison
+library(ROCR)
+
+knn_model <- readRDS('/home/max/code/jh-datasci-projects/practical_machine_learning/accel_model_knn.rds')
+knn_model_pred <- predict(knn_model, testing, type="prob")
+tru_labels <- testing[testing$classe == 'A', ]$classe
+knn_roc_pred_classeA <- prediction(predictions=knn_model_pred$A, labels=tru_labels)
+knn_perf <- performance()
+
+roc.3 = roc(as.numeric(mdl$trainingData$.outcome=='case'),aggregate(case~rowIndex,mdl$pred,mean)[,'case'])
+
+
+gbm_model <- readRDS('/home/max/code/jh-datasci-projects/practical_machine_learning/accel_model_gbm.rds')
+gbm_model_pred <- predict(gbm_model, testing)
+
+confusionMatrix(knn_model_pred, testing$classe)$overall[["Accuracy"]]
+confusionMatrix(knn_model_pred, testing$classe)$overall[["Kappa"]]
+confusionMatrix(gbm_model_pred, testing$classe)$overall[["Accuracy"]]
+confusionMatrix(gbm_model_pred, testing$classe)$overall[["Kappa"]]
 
 
