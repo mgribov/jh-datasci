@@ -1,0 +1,47 @@
+---
+title: "Historic and Cultural Attractions in Washington Heights Neighborhood of New York City"
+author: "max@neuropunks.org"
+date: "May 27, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Museums, Old Architecture, Landmark Buildings
+
+```{r, echo=FALSE}
+library(leaflet)
+
+ico <- makeIcon(
+  iconUrl = "http://neuropunks.org/museum-clipart-icon.png",
+  iconWidth = 20, iconHeight = 31, 
+  iconAnchorX = 10, iconAnchorY = 16
+)
+
+latlng <- data.frame(
+  lat = c(40.8648646, 40.8344492, 40.8335224, 40.8674002, 40.8602463, 40.8502534, 40.8322904, 40.8464841),
+  lng = c(-73.9318366,-73.9386381,-73.9468795, -73.9229891, -73.9350141, -73.9471248, -73.9457396, -73.937935)
+)
+
+popups <- c(
+  "<a href='https://www.metmuseum.org/visit/met-cloisters'>The Cloisters</a>", 
+  "<a href='http://www.morrisjumel.org/'>Morris-Jumel Mansion</a>", 
+  "<a href='http://www.hispanicsociety.org/'>Hispanic Society Museum & Library</a>",
+  "<a href='http://dyckmanfarmhouse.org/'>Dyckman Farmhouse Museum & Garden</a>",
+  "<a href='https://www.forttryonparktrust.org/'>Billings Mansion @ Ft. Tryon Park</a>",
+  "<a href='https://www.nycgovparks.org/parks/fort-washington-park/highlights/11044'>Little Red Lighthouse</a>",
+  "<a href='http://www.intercessionnyc.org/'>Church of Intersection</a>",
+  "<a href='https://www.unitedpalace.org/'>United Palace of Cultural Arts</a>"
+)
+
+my_map <- latlng %>% 
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(icon = ico, popup = popups)
+
+my_map
+```
+
+
