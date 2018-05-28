@@ -1,0 +1,63 @@
+---
+title: "Exploring mtcars Dataset with Plotly and Slidify"
+author: "Max Gribov"
+date: "May 28, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exploring mtcars dataset
+
+### 2-D Plot
+
+```{r plot_2d, echo = FALSE, message=FALSE}
+library(plotly)
+data("mtcars")
+
+plot_ly(x = mtcars$wt, y = mtcars$mpg, mode = "markers", color=as.factor(mtcars$cyl), size=mtcars$hp) %>%
+  layout(title = "MPG related to Weight, Cyls, and HPs")
+```
+
+### 3-D Plot
+
+```{r plot_3d, echo = FALSE, message=FALSE}
+library(plotly)
+
+plot_ly(x = mtcars$wt, y = mtcars$mpg, z = mtcars$qsec, mode="markers", type = "scatter3d", color=as.factor(mtcars$cyl), size=mtcars$hp)
+```
+
+### Time Series Plot
+
+```{r ts, echo = FALSE, message=FALSE}
+library(plotly)
+library(tidyr)
+library(dplyr)
+data("EuStockMarkets")
+
+stocks <- as.data.frame(EuStockMarkets) %>%
+  gather(index, price) %>%
+  mutate(time = rep(time(EuStockMarkets), 4))
+
+plot_ly(x = stocks$time, y = stocks$price, color = stocks$index)
+```
+
+### Box Plot
+
+```{r plot_box, echo = FALSE, message=FALSE}
+library(plotly)
+data("iris")
+
+plot_ly(y = iris$Petal.Length, type = "box", color=iris$Species)
+```
+
+### Heatmap
+
+```{r plot_heat, echo = FALSE, message=FALSE}
+library(plotly)
+
+terrain <- matrix(rnorm(100*100), nrow=100, ncol=100)
+plot_ly(z=terrain, type = "heatmap") # type="surface" is also possible
+```

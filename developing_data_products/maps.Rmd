@@ -1,6 +1,6 @@
 ---
 title: "Historic and Cultural Attractions in Washington Heights Neighborhood of New York City"
-author: "max@neuropunks.org"
+author: "Max Gribov"
 date: "May 27, 2018"
 output: html_document
 ---
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(leaflet)
 
 ico <- makeIcon(
-  iconUrl = "http://neuropunks.org/museum-clipart-icon.png",
+  iconUrl = "museum-clipart-icon.png",
   iconWidth = 20, iconHeight = 31, 
   iconAnchorX = 10, iconAnchorY = 16
 )

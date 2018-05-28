@@ -1,0 +1,33 @@
+---
+title: "Exploring Fiji Earthquakes"
+author: "Max Gribov"
+date: "May 28, 2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Earthquakes off Fiji
+
+This presentation shows the distribution of the earthquakes off Fiji by their location, depth, and magnitude. 
+
+This data comes from the bundled *quakes* dataset.
+
+## Visualization
+
+```{r plot_3d, echo = FALSE, message=FALSE}
+library(plotly)
+
+
+plot_ly(x = quakes$long, y = quakes$lat, z = -1 * quakes$depth, mode="markers", type = "scatter3d", size=quakes$mag) %>%
+  layout(
+    title = "Fiji Earthquakes: Location, Depth, Magnitude", 
+    scene = list(
+      xaxis = list(title = "Longitude"),
+      yaxis = list(title = "Latitude"),
+      zaxis = list(title = "Depth")
+      )
+    )
+```
