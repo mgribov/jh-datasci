@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(plotly)
 
 shinyUI(
   navbarPage("Predict MPG for a car based on some key parameters",
@@ -32,8 +33,8 @@ shinyUI(
               
             tabsetPanel(
               type = "tabs", 
-              tabPanel("Predicted MPG", verbatimTextOutput("pred")),
-              tabPanel("Regression model", "Contains")
+              tabPanel("Predicted MPG", verbatimTextOutput("pred"), plotlyOutput("plot_pred")),
+              tabPanel("Raw Model Details", verbatimTextOutput("model_details"))
             )
           )
         )
@@ -41,31 +42,18 @@ shinyUI(
     ),
     
     # description of the method/model    
-    tabPanel("The model and methodology",
-      h2("Motor Trend Car Road Tests"),
+    tabPanel("Usage, model, and methodology",
+      h2("Predicting car's MPG value"),
       hr(),
-      h3("Description"),
-      helpText("The data was extracted from the 1974 Motor Trend US magazine,",
-               " and comprises fuel consumption and 10 aspects of automobile design and performance",
-               " for 32 automobiles (1973–74 models)."),
-      h3("Format"),
-      p("A data frame with 32 observations on 11 variables."),
-      
-      p("  [, 1]   mpg         Miles/(US) gallon"),
-      p("  [, 2]	 cyl	 Number of cylinders"),
-      p("  [, 3]	 disp	 Displacement (cu.in.)"),
-      p("  [, 4]	 hp	 Gross horsepower"),
-      p("  [, 5]	 drat	 Rear axle ratio"),
-      p("  [, 6]	 wt	 Weight (lb/1000)"),
-      p("  [, 7]	 qsec	 1/4 mile time"),
-      p("  [, 8]	 vs	 V/S"),
-      p("  [, 9]	 am	 Transmission (0 = automatic, 1 = manual)"),
-      p("  [,10]	 gear	 Number of forward gears"),
-      p("  [,11]	 carb	 Number of carburetors"),
-      
-      h3("Source"),
-      
-      p("Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391–411.")
+      h3("Usage"),
+      p("Use the input fields to enter your car's weight, transmission type, and 1/4 mile distance time going from 0mph."),
+      p("The resulting predicted MPG value is based on a linear model trained on mtcars dataset."),
+      p("You can see the raw model summary on 'Raw Model Details' tab"),
+      h3("Model"),
+      p("The most optimal linear model, using weight ('wt'), 1/4 mile time ('qsec'), and transmission type ('am') columns, was found as part of the final project for Regression Models class."),
+      p("It was built using built-on lm() function."),
+      h3("Data"),
+      p("The linear model is built on mtcars dataset: https://vincentarelbundock.github.io/Rdatasets/doc/datasets/mtcars.html")
     )
   )
 )
