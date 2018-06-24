@@ -15,11 +15,25 @@ This presentation shows the distribution of the earthquakes off Fiji by their lo
 
 This data comes from the bundled *quakes* dataset.
 
+```{r plot_code, eval = FALSE, echo = TRUE, message=FALSE}
+library(plotly)
+
+plot_ly(x = quakes$long, y = quakes$lat, z = -1 * quakes$depth, 
+    mode="markers", type = "scatter3d",  size=quakes$mag) %>%
+  layout(
+    title = "Fiji Earthquakes: Location, Depth, Magnitude", 
+    scene = list(
+      xaxis = list(title = "Longitude"),
+      yaxis = list(title = "Latitude"),
+      zaxis = list(title = "Depth")
+      )
+    )
+```
+
 ## Visualization
 
 ```{r plot_3d, echo = FALSE, message=FALSE}
 library(plotly)
-
 
 plot_ly(x = quakes$long, y = quakes$lat, z = -1 * quakes$depth, mode="markers", type = "scatter3d", size=quakes$mag) %>%
   layout(
