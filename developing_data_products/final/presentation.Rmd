@@ -1,0 +1,60 @@
+---
+title: "Vehicle MPG Prediction"
+author: "Max Gribov"
+date: "June 24, 2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Predicting Miles per Gallon for a Vehicle
+
+This application attempts to estimate the MPG value for a given vehicle, based on a linear model trained on *mtcars* dataset.
+
+In testing, a linear model using vehicle's weight, transmission type, and 1/4 mile time was found to be the most accurate.
+
+The application also plots the values of the user's vehicle against the data used to train the model.
+
+
+## Training the Model
+
+- First, we build a model with all the variables
+
+```{r train1, echo = TRUE}
+lm_full <- lm(mpg ~ ., data=mtcars)
+```
+
+- Next, we use step() function to find most optimal model
+
+```{r train2, echo = TRUE}
+lm_step <- step(lm_full, trace=0)
+```
+
+- The final model uses *wt*, *qsec*, and *am* variables.
+
+```{r details1, echo = TRUE}
+summary(lm_step)$coeff
+```
+
+
+## Model Details
+
+This final model has high R-Squared value and low residual standard error
+
+```{r details2, echo = TRUE}
+summary(lm_step)$r.squared
+summary(lm_step)$sigma
+```
+
+
+## Sample MPG Prediction
+
+Example of using the model to predict MPG for a vehicle with weight of 3000 lbs, manual transmission, and 17 second 1/4 mile time
+
+```{r pred, echo = TRUE}
+my <- data.frame(wt=3, am=1, qsec=17)
+predict(lm_step, my)
+```
+
