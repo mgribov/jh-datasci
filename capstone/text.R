@@ -68,13 +68,13 @@ load("~/code/jh-datasci-projects/capstone/rdata/quadgrams.Rdata")
 #################################
 
 # create indexed data.table structures for each word/ngram
-ngram_search_n2 <- as.data.table(bigrams[0:100000, ])
+ngram_search_n2 <- as.data.table(bigrams[0:200000, ])
 setkey(ngram_search_n2, term)
 
-ngram_search_n3 <- as.data.table(trigrams[0:100000, ])
+ngram_search_n3 <- as.data.table(trigrams[0:200000, ])
 setkey(ngram_search_n3, term)
 
-ngram_search_n4 <- as.data.table(quadgrams[0:100000, ])
+ngram_search_n4 <- as.data.table(quadgrams[0:200000, ])
 setkey(ngram_search_n2, term)
 
 save(ngram_search_n2, file="~/code/jh-datasci-projects/capstone/rdata/ngram_search_n2.Rdata")

@@ -3,7 +3,7 @@ make_search_query <- function(w) {
 }
 
 most_common_word <- function(min_pred) {
-  top <- arrange(most_common, desc(count))
+  top <- arrange(unigrams, desc(count))
   return(format_results(top[0:min_pred, ]))
 }
 
@@ -117,7 +117,10 @@ predict_word <- function(phrase, min_pred = 5) {
   return(best[0:min_pred])
 }
 
+# @todo runtime profiling
 # good test case: word "psychology" - not followed by anything?
 # good test case for slow query: "psychology is a" - much slower than others
-p <- predict_word("psychology is a")
+# random sentence that was built by using suggestions starting with "what":
+# "what is the best thing to do in my spare time"
+p <- predict_word("psychology")
 print(p)
