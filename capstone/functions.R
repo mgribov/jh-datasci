@@ -5,7 +5,6 @@ make_search_query <- function(w) {
 most_common_word <- function(min_pred) {
   top <- arrange(most_common, desc(count))
   return(format_results(top[0:min_pred, ]))
-  
 }
 
 # look for the best n-gram (n_words + 1) match for this phrase
@@ -25,6 +24,7 @@ top_match <- function(w, n_words) {
     ngram_search <- ngram_search_n2
     
   } else {
+    # @todo this probably causes NA in some preds
     return()
   }
   
@@ -35,6 +35,8 @@ top_match <- function(w, n_words) {
   return(top)
 }
 
+# make sure the top list is of proper length
+# if not, add entries from lower order ngrams
 ensure_filled <- function(top, w, min_pred) {
   n_words = length(w)
   total_matches <- length(top)
@@ -54,6 +56,7 @@ ensure_filled <- function(top, w, min_pred) {
   return(top)
 }
 
+# format the sorted best match list to only be the predicted words
 format_results <- function(top) {
   best <- NULL
   
