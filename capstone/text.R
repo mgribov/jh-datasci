@@ -95,99 +95,14 @@ load("~/code/jh-datasci-projects/capstone/rdata/ngram_search_n4.Rdata")
 # if false ?
 
 # top 10 matches for bigrams starting with "one"
-comparePhrase <- "^day "
-rawMatch <- grep(comparePhrase, ngram_search_n2$term)[0:10]
-top_n2 <- ngram_search_n2[rawMatch, ][order(count, decreasing=TRUE)]
+phrase <- "a"
+w <- unlist(strsplit(phrase, " "))
+comparePhrase <- paste("^", paste(w, collapse=" "), "\\b", sep="")
 
-# top 10 trigram matches for best match above
-comparePhrase2 <- paste("^", top_n2[1:1, term], sep="")
-rawMatch <- grep(comparePhrase2, ngram_search_n3$term)[0:10]
-top_n3 <- ngram_search_n3[rawMatch, ][order(count, decreasing=TRUE)]
-
-# top 10 quadgram matches for anything above
-comparePhrase3 <- paste("^", top_n3[1:1, term], sep="")
-rawMatch <- grep(comparePhrase3, ngram_search_n4$term)[0:10]
-top_n4 <- ngram_search_n4[rawMatch, ][order(count, decreasing=TRUE)]
+rawMatch <- grep(comparePhrase, ngram_search_n2$term)
+top_n2 <- ngram_search_n2[rawMatch, ]
+best_n2 <- arrange(top_n2, desc(count))
 ########################################################################
-
-make_compare_phrase <- function(w) {
-  return(paste("^", paste(w, collapse=" "), "\\b", sep=""))
-}
-
-top_match <- function(comparePhrase, ngram_search, num = 10) {
-  rawMatch <- grep(comparePhrase, ngram_search$term)
-  top <- ngram_search[rawMatch, ][order(count, decreasing=TRUE)]
-  return(top[0:num])
-}
-
-# return best next match given current ngrams data
-predictWord <- function(testPhrase) {
-  w <- unlist(strsplit(testPhrase, " "))
-  
-  # how big is this string, will work with max of 3 words
-  n_words = length(w)
-  if (n_words == 0) {
-    # return most common word
-    return()
-  }
-  
-  # use appropriate ngram dict based on number of words passed
-  if (n_words > 3) {
-    # use last 3 words
-    return(predictWord(tail(w, 3)))
-    
-  } else if (n_words == 3) {
-    # search quadgrams
-    ngram_search <- ngram_search_n4
-    
-  } else if (n_words == 2) {
-    # search trigrams
-    ngram_search <- ngram_search_n3
-    
-  } else if (n_words == 1) {
-    # search bigrams
-    ngram_search <- ngram_search_n2
-  }
-  
-  # individual prob for each word 
-  temp <- data1gram$word %in% userIn
-  unigramCount <- data1gram$freq[temp] / sum(data1gram$freq)
-
-  # matching is by regex of the phrase starting with these words
-  comparePhrase = make_compare_phrase(w)
-  
-  # get top 5 best matches
-  top <- top_match(comparePhrase, ngram_search, 5)
-  print(top)
-  
-  # if no match, then shorten the string by 1 word removing the first one, and try agan
-  if (is.na(top$term[0:1])) {
-    return(predictWord(tail(w, n_words - 1)))
-  }
-  
-  # see which suggested match is best according to bigrams for last 2 words, including the suggested
-  # will use log probability
-  best <- NULL
-  for (i in 1:length(top)) {
-    term <- top$term[i]
-    
-    if (!is.na(term)) {
-      t <- unlist(strsplit(term, " "))
-      
-      # check how high this bigram would rank
-      t <- make_compare_phrase(tail(t, 2))
-      top_t <- top_match(t, ngram_search_n2, 1)
-      print(top_t)
-    }
-    
-  }  
-  
-  # return last word of the best match for this n-gram
-  match <- unlist(strsplit(top$term[0:1], " "))
-  return(tail(match, 1))
-}
-
-predictWord("what the")
 
 
 
