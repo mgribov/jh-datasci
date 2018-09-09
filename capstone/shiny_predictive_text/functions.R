@@ -36,7 +36,6 @@ top_match <- function(w, n_words) {
 
 # make sure the top list is of proper length
 # if not, add entries from lower order ngrams
-# @todo this is the expensive function?
 ensure_filled <- function(top, w, min_pred) {
   n_words = length(w)
   total_matches <- dim(top)[1]
@@ -61,6 +60,8 @@ ensure_filled <- function(top, w, min_pred) {
   if (total_matches < min_pred) {
     top <- rbind(top, most_common_word(min_pred - total_matches))
   }
+  
+  top <- arrange(top, desc(count))
   
   return(top)
 }
@@ -98,7 +99,7 @@ best_match <- function(top) {
     last_word <- tail(phrase, 1)
 
     # add the counts together for words which appears in other order grams
-    # @todo for now, just multiply by n in ngram as weight
+    # @todo for now, just multiply by n in ngram as a weight
     if (!last_word %in% seen) {
       seen <- c(seen, last_word)
       cnt <- top[i, 'count'] * length(phrase)
@@ -112,7 +113,6 @@ best_match <- function(top) {
   
   best <- arrange(best, desc(count))
 
-  # @todo just format current set for now
   return(format_results(best))
 }
 
@@ -124,13 +124,12 @@ predict_word <- function(phrase, min_pred = 5) {
   n_words = length(w)
   if (n_words == 0) {
     # return most common word
-    # @todo just freq count, or log prob?
     return(format_results(most_common_word(min_pred)))
   }
   
   if (n_words > 3) {
     # use last 3 words
-    return(predict_word(tail(w, 3)))
+    return(predict_word(tail(w, 3), min_pred))
   }
   
   # get n-gram matches for this phrase sorted by their freq
@@ -144,7 +143,6 @@ predict_word <- function(phrase, min_pred = 5) {
   # make sure we have the requested number of returned words
   # will fill empty slots with matches from lower order gram
   top <- ensure_filled(top, w, min_pred)
-  top <- arrange(top, desc(count))
   
   # loop through top matches
   # measure the relevance of each bigram along with each of its words
@@ -154,10 +152,5 @@ predict_word <- function(phrase, min_pred = 5) {
   return(best[0:min_pred])
 }
 
-# @todo runtime profiling
-# good test case: word "psychology" - not followed by anything?
-# good test case for slow query: "psychology is a" - much slower than others
-# random sentence that was built by using suggestions starting with "what":
-# "what is the best thing to do in my spare time"
 #p <- predict_word("the")
 #print(p)
