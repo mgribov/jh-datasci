@@ -54,17 +54,17 @@ bigrams <- term_stats(docs, ngrams = 2:2)
 trigrams <- term_stats(docs, ngrams = 3:3)
 quadgrams <- term_stats(docs, ngrams = 4:4)
 
-save(unigrams, file="~/code/jh-datasci-projects/capstone/rdata/unigrams.Rdata")
-save(bigrams, file="~/code/jh-datasci-projects/capstone/rdata/bigrams.Rdata")
-save(trigrams, file="~/code/jh-datasci-projects/capstone/rdata/trigrams.Rdata")
-save(quadgrams, file="~/code/jh-datasci-projects/capstone/rdata/quadgrams.Rdata")
+save(unigrams, file="~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/unigrams.Rdata")
+save(bigrams, file="~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/bigrams.Rdata")
+save(trigrams, file="~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/trigrams.Rdata")
+save(quadgrams, file="~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/quadgrams.Rdata")
 #################################
 
 # load saved data based on percentage of total corpus
-load("~/code/jh-datasci-projects/capstone/rdata/unigrams.Rdata")
-load("~/code/jh-datasci-projects/capstone/rdata/bigrams.Rdata")
-load("~/code/jh-datasci-projects/capstone/rdata/trigrams.Rdata")
-load("~/code/jh-datasci-projects/capstone/rdata/quadgrams.Rdata")
+load("~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/unigrams.Rdata")
+load("~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/bigrams.Rdata")
+load("~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/trigrams.Rdata")
+load("~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/quadgrams.Rdata")
 #################################
 
 # create indexed data.table structures for each word/ngram
@@ -77,14 +77,14 @@ setkey(ngram_search_n3, term)
 ngram_search_n4 <- as.data.table(quadgrams[0:200000, ])
 setkey(ngram_search_n2, term)
 
-save(ngram_search_n2, file="~/code/jh-datasci-projects/capstone/rdata/ngram_search_n2.Rdata")
-save(ngram_search_n3, file="~/code/jh-datasci-projects/capstone/rdata/ngram_search_n3.Rdata")
-save(ngram_search_n4, file="~/code/jh-datasci-projects/capstone/rdata/ngram_search_n4.Rdata")
+save(ngram_search_n2, file="~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/ngram_search_n2.Rdata")
+save(ngram_search_n3, file="~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/ngram_search_n3.Rdata")
+save(ngram_search_n4, file="~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/ngram_search_n4.Rdata")
 ###########################################
 
-load("~/code/jh-datasci-projects/capstone/rdata/ngram_search_n2.Rdata")
-load("~/code/jh-datasci-projects/capstone/rdata/ngram_search_n3.Rdata")
-load("~/code/jh-datasci-projects/capstone/rdata/ngram_search_n4.Rdata")
+load("~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/ngram_search_n2.Rdata")
+load("~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/ngram_search_n3.Rdata")
+load("~/code/jh-datasci-projects/capstone/shiny_predictive_text/rdata/ngram_search_n4.Rdata")
 ############################################
 
 # general matching strategy:
