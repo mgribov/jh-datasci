@@ -103,7 +103,7 @@ best_match <- function(top) {
     if (!last_word %in% seen) {
       seen <- c(seen, last_word)
       cnt <- top[i, 'count'] * length(phrase)
-      best <- rbind(best, data.table(term=last_word, count=cnt$count), fill=TRUE) 
+      best <- rbind(best, data.table(term=last_word, count=cnt), fill=TRUE) 
       
     } else {
       cnt <- best[best$term == last_word, 'count'] + (top[i, 'count'] * length(phrase))
