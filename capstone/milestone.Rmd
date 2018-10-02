@@ -1,0 +1,85 @@
+---
+title: "JH Data Science Capstone - Milestone Report"
+author: "Max Gribov"
+date: "September 29, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Summary
+
+The goal of the capstone project is to build a predictive text application. The application will use the words user typed to provide a suggestion for the next word. Number of suggested words can be a tuneable parameter, with 5 as default. The application will suggest the words by using an algorithm/model based on statistical properties of the training data.
+
+Specifically, n-gram statistics will be used. N-Gram can be defined as a sequence of N words in their original order from the text. For example, "can be" is a bi-gram, "how do i" is a tri-gram. The metric of how often that particular n-gram occurs can be used to order these n-grams by their prevalence. 
+
+The milestone report explores the word and n-gram statistics of the training data, outlines the suggestion algorithm, and outlines some potential future improvements.
+
+
+## Training data exploration
+
+The training data for this project contains a large number of blog posts, tweets, and news in English.
+The dataset is very large, so we will use only 5% of the total content to train the model.
+The first task is to import and clean the data, which includes stripping out invalid characters, removing profanity, removing punctuation, and fixing contractions (i.e. "dont" -> "do not")
+```{r getdata, eval=FALSE, message=FALSE, warning=FALSE}
+library(tm)
+library(stringi)
+library(qdap)
+
+# initial load and cleaning of corpus
+# 5% of lines from each dataset
+docs <- Corpus(DirSource('~/code/jh-datasci-projects/capstone/final/en_US/smaller'))
+
+# standard cleaning
+removeUnicode <- function(x) stri_replace_all_regex(x,"[^\x20-\x7E]","")
+docs <- tm_map(docs, content_transformer(removeUnicode))
+
+docs <- tm_map(docs, stripWhitespace)
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, removeNumbers)
+docs <- tm_map(docs, tolower)
+
+docs <- tm_map(docs, content_transformer(replace_contraction))
+
+# source: http://www.cs.cmu.edu/~biglou/resources/bad-words.txt
+profanity = readLines('~/code/jh-datasci-projects/capstone/bad-words.txt')
+docs <- tm_map(docs, removeWords, profanity)
+
+writeCorpus(docs, path="~/code/jh-datasci-projects/capstone/corpus")
+```
+
+
+Next, we collect basic corpus statistics: corpus size, most common words, most common n-grams.
+```{r corpus_grams, results='asis', message=FALSE, warning=FALSE}
+library(corpus)
+library(tm)
+docs <- Corpus(DirSource('~/code/jh-datasci-projects/capstone/corpus'))
+
+unigrams <- term_stats(docs, ngrams = 1:1)
+bigrams <- term_stats(docs, ngrams = 2:2)
+trigrams <- term_stats(docs, ngrams = 3:3)
+quadgrams <- term_stats(docs, ngrams = 4:4)
+
+# all words
+all_unique_words <- dim(unigrams)[1]
+all_words <- sum(unigrams$count)
+
+print(paste("Total Number of Words:", all_words, ", Number of Unique Words:", all_unique_words))
+```
+
+
+Histograms for most common words/n-grams (4-gram maximum).
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+
+## Prediction algorithm
+
+
+## Measuring Performance
+
+
+## Potential future improvements
