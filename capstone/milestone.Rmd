@@ -22,7 +22,7 @@ The milestone report explores the word and n-gram statistics of the training dat
 
 The training data for this project contains a large number of blog posts, tweets, and news in English.
 The dataset is very large, so we will use only 5% of the total content to train the model.
-The first task is to import and clean the data, which includes stripping out invalid characters, removing profanity, removing punctuation, and fixing contractions (i.e. "dont" -> "do not")
+The first task is to import and clean the data, which includes stripping out invalid characters, removing profanity, and removing punctuation.
 ```{r getdata, eval=FALSE, message=FALSE, warning=FALSE}
 library(tm)
 library(stringi)
@@ -55,6 +55,7 @@ Next, we collect basic corpus statistics: corpus size, most common words, most c
 ```{r corpus_grams, results='asis', message=FALSE, warning=FALSE}
 library(corpus)
 library(tm)
+
 docs <- Corpus(DirSource('~/code/jh-datasci-projects/capstone/corpus'))
 
 unigrams <- term_stats(docs, ngrams = 1:1)
@@ -66,17 +67,45 @@ quadgrams <- term_stats(docs, ngrams = 4:4)
 all_unique_words <- dim(unigrams)[1]
 all_words <- sum(unigrams$count)
 
-print(paste("Total Number of Words:", all_words, ", Number of Unique Words:", all_unique_words))
+cat(paste("Total Number of Words:", all_words, ", Number of Unique Words:", all_unique_words))
+
 ```
 
 
-Histograms for most common words/n-grams (4-gram maximum).
-```{r pressure, echo=FALSE}
-plot(pressure)
+#### Most popular words (unigrams) and other n-grams (up to n=4).
+```{r gram_plots, message=FALSE, warning=FALSE}
+library(ggplot2)
+
+top_unigrams <- ggplot(unigrams[0:10,], aes(x = reorder(term, count), y = count))
+top_unigrams <- top_unigrams + geom_bar(stat = "identity") + coord_flip()  + labs(title = "Top 10 Unigrams")
+
+top_bigrams <- ggplot(bigrams[0:10,], aes(x = reorder(term, count), y = count))
+top_bigrams <- top_bigrams + geom_bar(stat = "identity") + coord_flip()  + labs(title = "Top 10 Bigrams")
+
+top_trigrams <- ggplot(trigrams[0:10,], aes(x = reorder(term, count), y = count))
+top_trigrams <- top_trigrams + geom_bar(stat = "identity") + coord_flip()  + labs(title = "Top 10 Trigrams")
+
+top_quadgrams <- ggplot(quadgrams[0:10,], aes(x = reorder(term, count), y = count))
+top_quadgrams <- top_quadgrams + geom_bar(stat = "identity") + coord_flip() + labs(title = "Top 10 Quadgrams")
+
+top_unigrams
+top_bigrams
+top_trigrams
+top_quadgrams
 ```
 
 
 ## Prediction algorithm
+
+My initial approach is to simply use the counts of various n-grams to produce next suggested word.
+
+The algorithm would return a specified number of suggested words, ranked by "best suggestion" score, with default of 5 words.
+
+User's input would be truncated to maximum of last 3 words, and the next word would be suggested by looking for most common last word in the quadgram data. If no matches, or not enough matches are found, the input would be truncated again to last 2 words, and trigram data would be used, and so on, until the algorithm will return most common unigrams (single words). 
+
+So for example, based on the quadgram plot above, if user enters "for the first", the next top suggested word based on quadgram data would be "time".
+
+If there are not enough quadgrams to find required number of suggested words, the user's input would be truncated again to "the first", and trigram data would be searched for most popular trigrams which start with "the first", and so on to bigram and unigram data if needed.
 
 
 ## Measuring Performance
