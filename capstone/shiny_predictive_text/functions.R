@@ -84,13 +84,37 @@ format_results <- function(top) {
   return(best)  
 }
 
+get_prob <- function(user_input, last_word) {
+  # user_input: 1 word, last word of whatever we're predicting for
+  # last_word: the predicted word
+  # using markov assumption that using bigrams is enough
+  user_input <- tail(user_input, 1)
+  bigram <- paste(user_input, last_word, sep=" ")
+
+  # bayes rule
+  # prob(last_word | user_imput) = (prob(user_input | last_word) * prob(last_word)) / prob(user_input)
+  
+  # maximum likelihood estimation
+  # prob(last_word | user_input) = count(bigram(user_input + last_word)) / count(user_input)
+  cnt_bigram <- ngram_search_n2[ngram_search_n2$term == bigram,]
+  cnt_word <- unigrams[unigrams$term == user_input, ]
+  mle <- cnt_bigram$count / cnt_word$count
+
+  # @todo a hack to return something
+  if (length(mle) == 0) {
+    mle <- 0.000000001
+  }
+  
+  return(mle)
+}
+
 # take a list of top ngrams matched with regex and re-sort it according to probs
 # return the list of 1-gram words as sugestion for next word
-best_match <- function(top) {
+best_match <- function(top, user_input, min_pred) {
   seen <- NULL
   best <- data.table(term = character(), count = double())
 
-  # top 100 should be enough
+  # top 100 should be enough?
   num_terms <- ifelse(length(top$term) > 100, 100, length(top$term))
   
   # boost suggested word based on all n-grams ending with it
@@ -110,9 +134,19 @@ best_match <- function(top) {
     }
   }
   
+  # best suggestions based on counts
   best <- arrange(best, desc(count))
+  best <- best[0:min_pred, ]
 
-  return(format_results(best))
+  # resort these suggestions by their probabilities
+  best_prob <- data.table(term = character(), count = double())
+  for (i in 1:length(best$term)) {
+    prob <- get_prob(user_input, best[i, 'term'])
+    best_prob <- rbind(best_prob, data.table(term=best[i, 'term'], count=prob), fill=TRUE)
+  }
+  best_prob <- arrange(best_prob, desc(count))
+
+  return(format_results(best_prob))
 }
 
 # return best next match given current ngrams data
@@ -146,12 +180,12 @@ predict_word <- function(phrase, min_pred = 5) {
   # loop through top matches
   # measure the relevance of each bigram along with each of its words
   # bigrams which come from higher order grams should get additional boost
-  best <- best_match(top)
+  best <- best_match(top, w, min_pred)
 
   return(best[0:min_pred])
 }
 
 # best one so far starting with "what if you":
 # what if you want to see you again and again and again and again ...
-#p <- predict_word("what if")
-#print(p)
+p <- predict_word("what if")
+print(p)

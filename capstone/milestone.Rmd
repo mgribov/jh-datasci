@@ -51,7 +51,7 @@ writeCorpus(docs, path="~/code/jh-datasci-projects/capstone/corpus")
 ```
 
 
-Next, we collect basic corpus statistics: corpus size, most common words, most common n-grams.
+Next, we collect basic corpus statistics: corpus size, most common words, most common n-grams, and their distributions.
 ```{r corpus_grams, results='asis', message=FALSE, warning=FALSE}
 library(corpus)
 library(tm)
@@ -67,13 +67,23 @@ quadgrams <- term_stats(docs, ngrams = 4:4)
 all_unique_words <- dim(unigrams)[1]
 all_words <- sum(unigrams$count)
 
-cat(paste("Total Number of Words:", all_words, ", Number of Unique Words:", all_unique_words))
+cat(paste("Total Number of Words:", all_words, ", Number of Unique Words - Vocabulary:", all_unique_words))
 
 ```
 
 
+#### Frequency distribution of the n-grams (up to n=4) shows exponential decay, conforming to Zipf's law.
+```{r gram_plots_freq, echo=FALSE, message=FALSE, warning=FALSE}
+par(mfrow=c(2,2))
+plot(unigrams[0:100, 'count'], type="l", main="Top 100 Unigram Frequency", ylab="Frequency", xlab="Term Rank")
+plot(bigrams[0:100, 'count'], type="l", main="Top 100 Bigram Frequency", ylab="Frequency", xlab="Term Rank")
+plot(trigrams[0:100, 'count'], type="l", main="Top 100 Trigram Frequency", ylab="Frequency", xlab="Term Rank")
+plot(quadgrams[0:100, 'count'], type="l", main="Top 100 Quadgram Frequency", ylab="Frequency", xlab="Term Rank")
+```
+
+
 #### Most popular words (unigrams) and other n-grams (up to n=4).
-```{r gram_plots, message=FALSE, warning=FALSE}
+```{r gram_plots, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 
 top_unigrams <- ggplot(unigrams[0:10,], aes(x = reorder(term, count), y = count))
@@ -110,12 +120,18 @@ If there are not enough quadgrams to find required number of suggested words, th
 
 ## Measuring Performance
 
+To measure the accuracy of various suggesion algorithms and their improvements, we can take a number of n-grams from part of the corpus which we did not use for training, and use the algorithm to predict the last word of each sequence. Number of correct versus incorrect predictions can be used as a simple accuracy metric.
+
 
 ## Potential future improvements
 
-Considering end of sentence states, 
+Using a more sophisticated metric for suggessions than simple occurance count, for example Maximum Likelihood Estimation.
+
+Considering "end of sentence" states in user's input to properly control how many n-grams to use for search.
 
 Using Part Of Speech tagging to make decisions, so how likely are nouns to be followed by verbs versus adjectives for example.
 
-Exploring if its possible to use Recurring Neural Networks, specifically Long Short Term Memory networks, to predict the next word: https://arxiv.org/abs/1703.10724[https://arxiv.org/abs/1703.10724]
+Exploring if its possible to use Recurring Neural Networks, specifically Long Short Term Memory networks, to predict the next word: https://arxiv.org/abs/1703.10724
+
+
 
