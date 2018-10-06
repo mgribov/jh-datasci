@@ -187,5 +187,5 @@ predict_word <- function(phrase, min_pred = 5) {
 
 # best one so far starting with "what if you":
 # what if you want to see you again and again and again and again ...
-p <- predict_word("what if")
-print(p)
+#p <- predict_word("what if")
+#print(p)
