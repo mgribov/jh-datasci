@@ -99,11 +99,11 @@ top_quadgrams
 
 My initial approach is to simply use the counts of various n-grams to produce next suggested word.
 
-The algorithm would return a specified number of suggested words, ranked by "best suggestion" score, with default of 5 words.
+The algorithm would return a specified number of suggested words, ranked by "best suggestion", with default of 5 words.
 
 User's input would be truncated to maximum of last 3 words, and the next word would be suggested by looking for most common last word in the quadgram data. If no matches, or not enough matches are found, the input would be truncated again to last 2 words, and trigram data would be used, and so on, until the algorithm will return most common unigrams (single words). 
 
-So for example, based on the quadgram plot above, if user enters "for the first", the next top suggested word based on quadgram data would be "time".
+So for example, based on the quadgram plot above, if user enters "for the first", the next top suggested word based on quadgram data would be "time". 
 
 If there are not enough quadgrams to find required number of suggested words, the user's input would be truncated again to "the first", and trigram data would be searched for most popular trigrams which start with "the first", and so on to bigram and unigram data if needed.
 
@@ -112,3 +112,10 @@ If there are not enough quadgrams to find required number of suggested words, th
 
 
 ## Potential future improvements
+
+Considering end of sentence states, 
+
+Using Part Of Speech tagging to make decisions, so how likely are nouns to be followed by verbs versus adjectives for example.
+
+Exploring if its possible to use Recurring Neural Networks, specifically Long Short Term Memory networks, to predict the next word: https://arxiv.org/abs/1703.10724[https://arxiv.org/abs/1703.10724]
+

@@ -99,14 +99,13 @@ best_match <- function(top) {
     last_word <- tail(phrase, 1)
 
     # add the counts together for words which appears in other order grams
-    # @todo for now, just multiply by n in ngram as a weight
     if (!last_word %in% seen) {
       seen <- c(seen, last_word)
-      cnt <- top[i, 'count'] * length(phrase)
+      cnt <- top[i, 'count']
       best <- rbind(best, data.table(term=last_word, count=cnt), fill=TRUE) 
       
     } else {
-      cnt <- best[best$term == last_word, 'count'] + (top[i, 'count'] * length(phrase))
+      cnt <- best[best$term == last_word, 'count'] + (top[i, 'count'])
       best[best$term == last_word, 'count'] <- cnt$count   
     }
   }
@@ -152,5 +151,7 @@ predict_word <- function(phrase, min_pred = 5) {
   return(best[0:min_pred])
 }
 
-#p <- predict_word("the")
+# best one so far starting with "what if you":
+# what if you want to see you again and again and again and again ...
+#p <- predict_word("what if")
 #print(p)
