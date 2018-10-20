@@ -2,7 +2,9 @@
 title: "JH Data Science Capstone - Milestone Report"
 author: "Max Gribov"
 date: "September 29, 2018"
-output: html_document
+output: 
+  html_document:
+    highlight: pygments  
 ---
 
 ```{r setup, include=FALSE}
@@ -21,7 +23,26 @@ The milestone report explores the word and n-gram statistics of the training dat
 ## Training data exploration
 
 The training data for this project contains a large number of blog posts, tweets, and news in English.
+Linux wc command shows there are 4269678 total lines and 102073612 total words in all 3 files combined.
+```{r, engine = 'bash', eval = FALSE}
+wc -w -l *.txt
+  # lines  words    file  
+   899288  37334117 en_US.blogs.txt
+  1010242  34365936 en_US.news.txt
+  2360148  30373559 en_US.twitter.txt
+  4269678 102073612 total
+```
+
+
 The dataset is very large, so we will use only 5% of the total content to train the model.
+This was done by using the last 5% of the lines in each of the files, also via linux command line.
+```{r, engine = 'bash', eval = FALSE}
+tail -44964 en_US.blogs.txt > smaller/en_US.blogs-5percent.txt
+tail -50512 en_US.news.txt > smaller/en_US.news-5percent.txt
+tail -118007 en_US.twitter.txt > smaller/en_US.twitter-5percent.txt   
+```
+
+
 The first task is to import and clean the data, which includes stripping out invalid characters, removing profanity, and removing punctuation.
 ```{r getdata, eval=FALSE, message=FALSE, warning=FALSE}
 library(tm)
