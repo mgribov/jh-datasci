@@ -1,7 +1,7 @@
 library(shiny)
 
 shinyUI(
-  navbarPage("Predictive Text Using N-Grams",
+  navbarPage("TypeAhead: Predictive Text Using N-Grams",
             
     #main app
     tabPanel("Input",
@@ -15,7 +15,7 @@ shinyUI(
                           
           # prediction output
           mainPanel(
-            h3(textOutput("Main Panel")),
+            h3(textOutput("Output")),
             tabsetPanel(
               type = "tabs", 
               tabPanel("Predicted Text", verbatimTextOutput("pred"))

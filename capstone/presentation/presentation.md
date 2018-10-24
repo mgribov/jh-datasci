@@ -1,0 +1,58 @@
+TypeAhead
+========================================================
+author: Max Gribov
+date: October 24, 2018
+
+Suggesting next word based on current input to assist typing
+
+Coursera/Johns Hopkins Data Science Final Project
+
+TypeAhead - Overview
+========================================================
+
+[TypeAhead](https://mgribov.shinyapps.io/shiny_predictive_text/) is a predictive text application.
+
+- Allows user to type faster by suggesting next word
+- Up to 3 input words are used for suggestions
+- Shows up to 5 best suggested words
+- Based on most common word sequences (n-grams) from a large number of blogs, news, and tweets
+
+TypeAhead - Usage Instructions
+========================================================
+
+- Navigate to <https://mgribov.shinyapps.io/shiny_predictive_text/>
+- Select desired number of words to suggest (5 is default)
+- Start typing your sentence in *Your Input* box
+- See the suggested words in *Predicted Text* section, sorted by best match first
+
+TypeAhead - The Algorithm 
+========================================================
+
+- Uses most common n-grams from a training corpus of blogs, news, and tweets
+- Attempts to find most common n-gram which starts with user's input
+- Starts with 3 (at most) words from user's input (n=3)
+- If not enough matches are found, remove the first word from input (n=2), and look for lower order n-grams
+- Final list is sorted by maximum likelihood estimation of the last word of user input followed by the sugested word
+- Maximum liklihood estimation:
+$$
+MLE(w_{i}|w_{i-1}) = \frac {count(w_{i-1},w_{i})} {count(w_{i-1})}
+$$
+
+TypeAhead - Detailed Example
+========================================================
+
+- User types "what if i"
+- TypeAhead will find all 4-grams starting with "what if i", sorted by most common first
+- If not enough matches are found (default is 5), then input is reduced to "if i"
+- Now look for all 3-grams starting with "if i"
+- Repeat these steps until there are enough suggestions
+- For example, following words may be returned as suggestions "have", "dont", "can"
+- Sort these suggestions by calculating maximum likelihood for 2-grams "i have", "i dont", "i can"
+- Show this sorted list
+
+TypeAhead - Future Improvements
+========================================================
+
+- Consider punctuation, end of sentence state
+- Use Part of Speech tagging to capture relationships between nouns, verbs, other parts of speech
+- Using Long Short Term Memory networks to build a prediction model: <https://arxiv.org/abs/1703.10724>
